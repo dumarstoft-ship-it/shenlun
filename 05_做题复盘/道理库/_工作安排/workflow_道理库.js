@@ -2,12 +2,12 @@ export const meta = {
   name: 'shenlun-reason-library',
   description: '为广东申论大作文建一本道理库，并用真题、仿真卷和预测题测覆盖率',
   phases: [
-    { title: 'Mine', detail: '12 路从大方向解读和大词卡挖候选道理' },
+    { title: 'Mine', detail: '6 路从大方向解读和大词卡挖候选道理' },
     { title: 'Merge', detail: '只合并同一个机制，不设条数上限' },
     { title: 'Verify', detail: '逐批查真、稳，再查锚、白' },
     { title: 'Forecast', detail: '预测 12 道今年可能的作文题' },
-    { title: 'Derive', detail: '每道题独立列出需要的道理' },
-    { title: 'Match', detail: '拿道理库对每条需要判命中' },
+    { title: 'Derive', detail: '每道题独立列出需要的道理，一个代理 3 道' },
+    { title: 'Match', detail: '拿道理库对每条需要判命中，一个代理 4 道' },
     { title: 'Patch', detail: '补缺、复核、重判' },
     { title: 'Critic', detail: '找漏并补最后几条' },
   ],
@@ -16,7 +16,8 @@ export const meta = {
 const CTX = `背景：一位考生在备考 2026 年 12 月 7 日的广东省考申论。仓库在 /home/user/shenlun，只读，不要改任何文件，不要 commit。他的大作文改走"直觉流"：先用大白话想明白广东在这件事上真正卡在哪、为什么这么干，再用材料里的事实写出来。他没时间把大白话翻成考场上能写的句子，所以我们替他做一本"道理库"：几十条能反复用的真道理，每条是一句考场能写的白描句。三条标准：
 - 真：站在省里的位置看是真实的因果；材料承认代价时要写代价。不能把上电视的样板当普遍规律（"工厂变绿订单反而多了"是假道理，"绿色是门槛，跨过去的企业更有竞争力"才是真的）。
 - 稳：观点正确，和中央、省委的提法一致，语气适合申论，不讥讽、不发牢骚。
-- 白：一句只说一件事，名词具体，有因果就把"才""所以"写出来，不堆虚词，不喊口号，不超过 32 个字。`
+- 白：一句只说一件事，名词具体，有因果就把"才""所以"写出来，不堆虚词，不喊口号，不超过 32 个字。
+- 代价：只算省委在大会上会讲的那一层难处（如"环境承载力逼近极限""资源要素从乡村向城市净流出的局面尚未扭转"），操作层面的难处（申请繁琐、巡山危险）不算。`
 
 const THEMES = `主题表（来自仓库的《大词卡》）：1 走在前列/挑大梁/1310 具体部署；2 高质量发展/新发展理念；3 新质生产力/高水平科技自立自强/产业科技互促双强；4 现代化产业体系/制造业当家/两业协同；5 人工智能+/数字广东；6 扩大内需/新发展格局/全国统一大市场/投资于物和投资于人；7 全面深化改革/有效市场和有为政府/营商环境/放得活管得好；8 高水平对外开放/粤港澳大湾区/制度型开放；9 百千万工程/乡村全面振兴/城乡融合/县域经济；10 海洋强省/海上新广东；11 绿色发展/绿美广东/双碳；12 文化强省/文化创新创造/岭南文化；13 保障和改善民生/共同富裕/基本公共服务均等化/投资于人；14 统筹发展和安全/法治广东/平安广东；15 城市高质量发展/人民城市/城市更新。`
 
@@ -25,18 +26,12 @@ const PAST = `历年广东省考大作文题：2020 县级"推进国家治理体
 const DIR = '/home/user/shenlun/01_大方向解读/'
 const CARD = '/home/user/shenlun/04_文件原文/00_大词卡.md'
 const MINERS = [
-  { name: '通用：便宜用完了以后', files: DIR + '00_总入口.md、' + DIR + '00_五条线_看懂中国的政治.md，以及 /home/user/shenlun/04_文件原文/01_2026广东省政府工作报告.md 第 51 行（"同时我们清醒地看到"那一段）', cards: '43—258 行（第 1、2 张卡）', n: '10—14' },
-  { name: '产业体系', files: DIR + '产业体系/ 下 7 个文件', cards: '259—453 行（第 3、4 张卡）', n: '8—10' },
-  { name: '城市', files: DIR + '城市/ 下 6 个文件', cards: '1051—1103 行（第 15 张卡）', n: '6—8' },
-  { name: '大湾区和开放、改革', files: DIR + '大湾区和开放/ 下 6 个文件', cards: '562—655 行（第 7、8 张卡）', n: '8—10' },
-  { name: '干部和党建', files: DIR + '干部和党建/ 下 3 个文件', cards: '43—148 行（第 1 张卡）', n: '5—7' },
-  { name: '扩内需', files: DIR + '扩内需/ 下 5 个文件', cards: '523—561 行（第 6 张卡）', n: '6—8' },
-  { name: '新基建和人工智能', files: DIR + '新基建和人工智能/ 下 3 个文件', cards: '454—522 行（第 5 张卡）', n: '5—7' },
-  { name: '民生：一老一小、上学、看病、饭碗和兜底', files: DIR + '民生/ 下的 00_总览.md、一老一小.md、上学.md、看病.md、饭碗和兜底.md', cards: '910—980 行（第 13 张卡）', n: '7—9' },
-  { name: '民生：绿美、绿色转型、文化', files: DIR + '民生/ 下的 00_总览.md、绿美的山和水.md、绿色转型.md、文化.md', cards: '756—909 行（第 11、12 张卡）', n: '8—10' },
-  { name: '法治平安', files: DIR + '法治平安/ 下 7 个文件', cards: '981—1050 行（第 14 张卡）', n: '7—9' },
-  { name: '海洋', files: DIR + '海洋/ 下 5 个文件', cards: '711—755 行（第 10 张卡）', n: '5—7' },
-  { name: '百千万', files: DIR + '百千万/ 下 7 个文件', cards: '656—710 行（第 9 张卡）', n: '7—9' },
+  { name: '通用，加干部和党建', files: DIR + '00_总入口.md、' + DIR + '00_五条线_看懂中国的政治.md、' + DIR + '干部和党建/ 下 3 个文件，以及 /home/user/shenlun/04_文件原文/01_2026广东省政府工作报告.md 第 51 行（"同时我们清醒地看到"那一段）', cards: '43—258 行（第 1、2 张卡）', n: '14—18' },
+  { name: '产业体系，加新基建和人工智能', files: DIR + '产业体系/ 下 7 个文件、' + DIR + '新基建和人工智能/ 下 3 个文件', cards: '259—522 行（第 3、4、5 张卡）', n: '12—16' },
+  { name: '大湾区和开放、改革，加扩内需', files: DIR + '大湾区和开放/ 下 6 个文件、' + DIR + '扩内需/ 下 5 个文件', cards: '523—655 行（第 6、7、8 张卡）', n: '12—16' },
+  { name: '民生（一老一小、上学、看病、饭碗和兜底），加城市', files: DIR + '民生/ 下的 00_总览.md、一老一小.md、上学.md、看病.md、饭碗和兜底.md，以及 ' + DIR + '城市/ 下 6 个文件', cards: '910—980 行和 1051—1103 行（第 13、15 张卡）', n: '12—16' },
+  { name: '民生（绿美、绿色转型、文化），加海洋', files: DIR + '民生/ 下的 绿美的山和水.md、绿色转型.md、文化.md，以及 ' + DIR + '海洋/ 下 5 个文件', cards: '711—909 行（第 10、11、12 张卡）', n: '12—16' },
+  { name: '法治平安，加百千万', files: DIR + '法治平安/ 下 7 个文件、' + DIR + '百千万/ 下 7 个文件', cards: '656—710 行和 981—1050 行（第 9、14 张卡）', n: '12—16' },
 ]
 
 const T = '/home/user/shenlun/03_真题/文本/'
@@ -74,6 +69,7 @@ const VA_SCHEMA = { type: 'object', properties: { items: { type: 'array', items:
 const VB_SCHEMA = { type: 'object', properties: { items: { type: 'array', items: { type: 'object', properties: { id: STR, verdict: { type: 'string', enum: ['keep', 'fix'] }, reason: STR, hook: STR, signals: STRS, anchor: STR, anchor_source: STR, anchor_found: { type: 'boolean' }, why: STR }, required: ['id', 'verdict', 'anchor_found'] } } }, required: ['items'] }
 const FORECAST_SCHEMA = { type: 'object', properties: { prompts: { type: 'array', items: { type: 'object', properties: { prompt: STR, type: STR, level: STR, why: STR, docs: STRS }, required: ['prompt', 'type', 'level', 'why', 'docs'] } } }, required: ['prompts'] }
 const NEEDS_SCHEMA = { type: 'object', properties: { needs: { type: 'array', items: { type: 'object', properties: { role: { type: 'string', enum: ['开头', '段', '代价'] }, point: STR, reason: STR, evidence: STR }, required: ['role', 'point', 'reason', 'evidence'] } } }, required: ['needs'] }
+const DERIVE_SCHEMA = { type: 'object', properties: { results: { type: 'array', items: { type: 'object', properties: { key: STR, needs: NEEDS_SCHEMA.properties.needs }, required: ['key', 'needs'] } } }, required: ['results'] }
 const PROPOSAL = { type: 'object', properties: { reason: STR, hook: STR, mechanism: STR, themes: INTS, signals: STRS, cost: { type: 'boolean' }, limit: STR } }
 const MATCH_SCHEMA = { type: 'object', properties: { results: { type: 'array', items: { type: 'object', properties: { key: STR, needs: { type: 'array', items: { type: 'object', properties: { idx: { type: 'integer' }, verdict: { type: 'string', enum: ['hit', 'partial', 'miss'] }, ids: STRS, note: STR, cue_ok: { type: 'boolean' }, proposal: PROPOSAL }, required: ['idx', 'verdict', 'ids', 'note', 'cue_ok'] } } }, required: ['key', 'needs'] } } }, required: ['results'] }
 const RECHECK_SCHEMA = { type: 'object', properties: { items: { type: 'array', items: { type: 'object', properties: { key: STR, idx: { type: 'integer' }, verdict: { type: 'string', enum: ['hit', 'partial', 'miss'] }, ids: STRS, note: STR }, required: ['key', 'idx', 'verdict', 'ids', 'note'] } } }, required: ['items'] }
@@ -84,8 +80,8 @@ const compact = es => es.map(e => ({ id: e.id, reason: e.reason, hook: e.hook, t
 
 const minePrompt = m => `${CTX}
 
-你负责挖一个主题：${m.name}。
-读：${m.files}（每个文件夹的 00_总览 全读，其余读懂"为什么要这么干、卡在哪、代价是什么"的部分即可）；再读大词卡 ${CARD} 的 ${m.cards}，只看"一句话""落点词""下面分几块""道理句""2026 年新提法"，跳过"考过没有"。不要读 03_真题/、02_仿真卷/、05_做题复盘/ 下的任何东西。
+你负责挖：${m.name}。两块都要挖到。
+读：${m.files}。每个文件夹的 00_总览 全读；其余文件先用 grep '^#' 看小节标题，挑讲"为什么、卡在哪、难在哪、代价"的小节读，不必通读。再读大词卡 ${CARD} 的 ${m.cards}，只看"一句话""落点词""下面分几块""道理句""2026 年新提法"，跳过"考过没有"。不要读 03_真题/、02_仿真卷/、05_做题复盘/ 下的任何东西。
 
 产出 ${m.n} 条候选道理。每条讲一个机制：为什么这件事非做不可，或者它靠什么起作用，或者它难在哪、代价是什么；不讲做了什么、成绩多大。优先：(1) 能挂在好几个主题上的；(2) 大方向解读里反复出现的硬道理（便宜用完了、门窄了、每块地上都有人、人比楼慢、明天谁来养、老规矩管不了新东西、新机会落在两翼和县）；(3) 至少两条讲代价或难处。
 
@@ -104,7 +100,7 @@ ${THEMES}`
 
 const mergePrompt = cands => `${CTX}
 
-下面是 12 个人从大方向解读和大词卡里挖出来的 ${cands.length} 条候选道理（JSON）。把它们合并成一本道理库。条数不设上限：只把讲同一个机制的合成一条，不同的机制不要为了凑数捏在一起（预计 50—80 条）：
+下面是 6 个人从大方向解读和大词卡里挖出来的 ${cands.length} 条候选道理（JSON）。把它们合并成一本道理库。条数不设上限：只把讲同一个机制的合成一条，不同的机制不要为了凑数捏在一起（预计 50—80 条）：
 - 讲同一个机制的合成一条，挑最白、最准的说法；themes 和 signals 取并集；anchor 留一条核对过的。
 - group：写"通用"（能挂 4 个以上主题的硬道理），或者写主题编号，如"11"。
 - 每个主题（1—15）至少有 3 条能用（算上通用的）；讲代价或难处的（cost=true）至少 10 条。
@@ -166,6 +162,19 @@ const deriveForecastPrompt = t => `${CTX}
 想清楚：一篇论证严密的好作文，开头要立什么理，每个分论点段的第二句（"凭什么"）要放什么道理，哪里该写一句代价或难处。只写道理：为什么、靠什么起作用、难在哪。不写口号、引语、成绩。
 
 给 4—6 条，每条：role（开头/段/代价）；point（不超过 30 字）；reason（大白话，不超过 40 字）；evidence（文件里能撑它的原话，不超过 40 字，注明文件）。`
+
+const deriveBatchPrompt = ts => `${CTX}
+
+你来给 ${ts.length} 道作文题分别列"需要哪些道理"，当作测试道理库的标准。每道题单独想，不要互相借。
+${ts.map(t => t.set === '预测'
+  ? `- ${t.key}：${t.title}（预测题，${t.level}，${t.type}）。命题人可能取材的文件：${(t.docs || []).join('、')}。只读这些文件；路径不对就在 /home/user/shenlun/04_文件原文/ 里找同名文件。`
+  : `- ${t.key}：${t.title}（${t.set}）。读题干和全部给定材料：${t.path}，作文题在末尾。${t.note || ''}`).join('\n')}
+
+不要读答案、范文、复盘或道理库：不读 /home/user/shenlun/05_做题复盘/ 和 /home/user/shenlun/03_真题/答案_以此为准/；预测题也不读 /home/user/shenlun/01_大方向解读/。
+
+每道题都想清楚：一篇论证严密的好作文，开头要立什么理，每个分论点段的第二句（"凭什么"）要放什么道理，哪里该写一句代价或难处。只写道理：为什么、靠什么起作用、难在哪。不写口号、引语、成绩。以材料自己的逻辑为准，材料承认的代价也算。策论文也一样，每一招背后"为什么要这么做"就是需要的道理。
+
+每道题给 4—6 条，每条：role（开头/段/代价）；point（这一处要论证什么，不超过 30 字）；reason（需要的那个道理，大白话，不超过 40 字）；evidence（材料或文件里能撑它的事实或原话，不超过 40 字，注明出处）。results 里每道题写 key 和 needs。`
 
 const matchPrompt = (tests, lib) => `${CTX}
 
@@ -253,7 +262,7 @@ function uniqIds(base, add) {
 }
 
 async function verifyEntries(entries, tag, dropped, ph) {
-  const res = await pipeline(chunk(entries, 10),
+  const res = await pipeline(chunk(entries, 20),
     (b, _o, i) => agent(lensA(b), { label: `${tag}:真稳-${i + 1}`, phase: ph, schema: VA_SCHEMA }),
     (va, b, i) => {
       const fa = applyA(b, va, dropped)
@@ -278,8 +287,12 @@ const libP = (async () => {
   return { entries: v, cands: cands.length, mergedCount: entries.length, note: (merged && merged.note) || '' }
 })()
 
-const derive = t => agent(t.set === '预测' ? deriveForecastPrompt(t) : derivePrompt(t), { label: `列:${t.key}`, phase: 'Derive', schema: NEEDS_SCHEMA })
-  .then(r => (r && r.needs && r.needs.length) ? { ...t, needs: r.needs } : null)
+const deriveBatch = ts => agent(deriveBatchPrompt(ts), { label: `列:${ts.map(t => t.key).join('+')}`, phase: 'Derive', schema: DERIVE_SCHEMA })
+  .then(r => {
+    const byKey = {}
+    ;((r && r.results) || []).forEach(x => { byKey[x.key] = x })
+    return ts.map(t => (byKey[t.key] && byKey[t.key].needs && byKey[t.key].needs.length) ? { ...t, needs: byKey[t.key].needs } : null)
+  })
 
 const fcP = (async () => {
   const f1 = await agent(forecast1(), { label: '预测:广东文件', phase: 'Forecast', schema: FORECAST_SCHEMA })
@@ -288,11 +301,11 @@ const fcP = (async () => {
   const l2 = (f2 && f2.prompts) || []
   const fs = l1.concat(l2).map((f, i) => ({ key: 'F' + String(i + 1).padStart(2, '0'), set: '预测', title: f.prompt, level: f.level, type: f.type, why: f.why, docs: f.docs }))
   log(`预测题 ${fs.length} 道`)
-  const ds = await parallel(fs.map(t => () => derive(t)))
+  const ds = (await parallel(chunk(fs, 3).map(c => () => deriveBatch(c)))).filter(Boolean).flat()
   return { fs, ds }
 })()
 
-const realP = parallel(TESTS.map(t => () => derive(t)))
+const realP = parallel(chunk(TESTS, 3).map(c => () => deriveBatch(c))).then(rs => rs.filter(Boolean).flat())
 
 const [lib, realD, fc] = await Promise.all([libP, realP, fcP])
 
@@ -301,7 +314,7 @@ const tests = realD.filter(Boolean).concat(fc.ds.filter(Boolean))
 log(`测试题 ${tests.length} 道，道理库 ${library.length} 条`)
 
 const testCompact = t => ({ key: t.key, title: t.title, needs: t.needs.map((n, idx) => ({ idx, role: n.role, point: n.point, reason: n.reason })) })
-const matchedRaw = await parallel(chunk(tests, 2).map(p => () => agent(matchPrompt(p.map(testCompact), compact(library)), { label: `判:${p.map(t => t.key).join('+')}`, phase: 'Match', schema: MATCH_SCHEMA })))
+const matchedRaw = await parallel(chunk(tests, 4).map(p => () => agent(matchPrompt(p.map(testCompact), compact(library)), { label: `判:${p.map(t => t.key).join('+')}`, phase: 'Match', schema: MATCH_SCHEMA })))
 
 const first = {}
 matchedRaw.filter(Boolean).forEach(m => ((m && m.results) || []).forEach(r => {
