@@ -4,12 +4,12 @@ src, out = sys.argv[1], sys.argv[2]
 lines = io.open(src, encoding='utf-8').read().split('\n')
 
 IDS = {
- '一页：按"这段的道理在说什么"挑': 'yiye', '逐个词：给谁用、要注意什么': 'zhuge',
+ '怎么用': 'yong', '一页总览': 'yiye', '逐个词': 'zhuge',
  '推：它推着往前走': 'tui', '托：没它不行，在下面撑着': 'tuo', '护：它挡住风险、稳住大局': 'hu',
- '引：它是为了人': 'yin', '卡：它卡在要害上': 'ka', '拓：它打开新地方': 'kuo', '连：它把两头接起来': 'lian',
- '先：它先走一步': 'xian', '干：它是干这件事的主力': 'gan', '软：它变成风气、名声、精神': 'ruan',
- '本：它本来就是 B 该有的（少用）': 'ben', '只表示重要的定位词：放开头，不放论点句': 'dingwei',
- '固定提法：只能给指定的主语': 'guding', '历年核对：表里收了多少': 'heduo', '复核记录': 'fuhe',
+ '引：它是为了人': 'yin', '卡：它卡在要害上，或者它就是办法': 'ka', '拓：它打开新地方': 'kuo', '连：它把两头接起来': 'lian',
+ '先：它先走一步，或者给方向': 'xian', '干：它是干这件事的主力': 'gan', '软：它变成精神、风气、名声': 'ruan',
+ '本：它本来就是 B 该有的（少用）': 'ben', '剔掉的词': 'tidiao', '只表示重要的定位词：放开头，不放论点句': 'dingwei',
+ '重要提法：完整判断及适用语境': 'tifa', '附：历年论点句用得最多的几类': 'tongji', '复核记录': 'fuhe', '网络来源': 'wangluo',
 }
 
 def inline(s):
@@ -76,7 +76,7 @@ flush_para(para)
 
 chips = []
 for lvl, t, hid in toc:
-    if lvl == 2: chips.append(f'<a class="chip chip2" href="#{hid}">{inline(t.split("：")[0])}</a>')
+    if lvl == 2 and hid not in ('yong',): chips.append(f'<a class="chip chip2" href="#{hid}">{inline(t.split("：")[0])}</a>')
     elif hid in ('tui','tuo','hu','yin','ka','kuo','lian','xian','gan','ruan','ben'): chips.append(f'<a class="chip" href="#{hid}">{inline(t.split("：")[0])}</a>')
 
 css = """
