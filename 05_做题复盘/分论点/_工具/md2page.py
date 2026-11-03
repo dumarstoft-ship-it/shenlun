@@ -101,6 +101,8 @@ h1{font-family:var(--serif); font-size:30px; line-height:1.3; margin:0; text-wra
 h2{font-family:var(--serif); font-size:21px; line-height:1.4; margin:22px 0 0; padding-top:16px; border-top:1px solid var(--line); text-wrap:balance}
 h3{font-family:var(--serif); font-size:17.5px; margin:14px 0 0; color:var(--fg)}
 p{margin:0}
+p,li{overflow-wrap:anywhere}
+.wrap{min-width:0}
 hr{display:none}
 ul,ol{margin:0; padding-left:1.25em; display:flex; flex-direction:column; gap:4px}
 li ul, li ol{margin-top:4px}
