@@ -5,7 +5,7 @@ src_dir, out = sys.argv[1], sys.argv[2]
 PAGE_TITLE = sys.argv[3] if len(sys.argv) > 3 else None
 PAGE_INTRO = sys.argv[4] if len(sys.argv) > 4 else None
 files = sorted(f for f in glob.glob(os.path.join(src_dir, '*.md')))
-order = ['00_说明', '00_怎么用', '00_B是什么', '00_总纲'] + [f'{i:02d}_' for i in range(1, 17)]
+order = ['00_优先级', '00_说明', '00_怎么用', '00_B是什么', '00_总纲'] + [f'{i:02d}_' for i in range(1, 100)]
 def key(f):
     b = os.path.basename(f)
     for i, o in enumerate(order):
@@ -108,7 +108,9 @@ for idx, f in enumerate(files):
     rest = [l for l in lines if not l.startswith('# ')]
     sid = f'e{idx}'
     base = os.path.basename(f)
-    if base.startswith('00_说明'):
+    if base.startswith('00_优先级'):
+        short = '先读哪个'
+    elif base.startswith('00_说明'):
         short = '说明'
     elif base.startswith('00_'):
         short = re.sub(r'^\d+ ', '', title).split('：')[0].replace('道理卡', '').strip() or '怎么用'

@@ -9,19 +9,27 @@ here = os.path.dirname(os.path.abspath(__file__))
 src = os.path.abspath(os.path.join(here, '../../按事论点与道理_独立稿'))
 out_html = os.path.join(src, '合并版.html')
 title = '道理卡合并版'
-intro = ('astra 独立稿和 Claude 重写稿逐面合并：21 件事，每面一句论点、主用和备用道理、作用链和核对。'
+intro = ('按优先级排：先读哪个 → 总纲 → 第一梯队到备用。astra 独立稿和 Claude 重写稿逐面合并：21 件事，每面一句论点、主用和备用道理、作用链和核对。'
          '只换了道理位，其余三栏是 astra 的原稿。【】和〔2026省市 材料三〕是脚本核过的原文；'
          '〔常用说法〕仓库无原文，冠出处前先核；〔自拟〕没有出处。')
 
 with tempfile.TemporaryDirectory() as tmp:
-    files = sorted(glob.glob(os.path.join(src, '[0-9][0-9]_*.md'))) + [os.path.join(src, '合并记录_两版道理位.md')]
+    # 按优先级排：先读哪个 → 总纲 → 各件事按梯队 → 合并记录放最后
+    rank = ['01', '02', '04', '08', '14', '03', '05', '07', '10', '09', '06', '16', '11', '15', '13', '17', '12', '18', '19', '20']
+    files = [os.path.join(src, '优先级_先读哪个.md'), glob.glob(os.path.join(src, '00_*.md'))[0]]
+    files += [glob.glob(os.path.join(src, f'{n}_*.md'))[0] for n in rank] + [os.path.join(src, '合并记录_两版道理位.md')]
     for f in files:
         t = open(f, encoding='utf-8').read()
         t = re.sub(r'<a id="[^"]*">\s*</a>', '', t)                          # 页内锚点，不论在哪
         t = re.sub(r'^\s*$\n(?=\s*$)', '', t, flags=re.M)                     # 删锚点后留下的连续空行
         t = re.sub(r'\[[A-Z][A-Za-z0-9\-]{1,12}\]\([^)]*\)', '', t)           # 来源编号链接整个去掉
         t = re.sub(r'\[([^\]]*)\]\((?:#|https?://)[^)]*\)', r'\1', t)         # 其余链接只留文字
-        name = '00_说明.md' if os.path.basename(f).startswith('合并记录') else os.path.basename(f)
+        b = os.path.basename(f)
+        if b.startswith('优先级'): name = '00_优先级.md'
+        elif b.startswith('合并记录'): name = '99_合并记录.md'
+        elif b.startswith('00_'): name = b
+        else: name = f'{rank.index(b[:2]) + 1:02d}_{b[3:]}'
+
         open(os.path.join(tmp, name), 'w', encoding='utf-8').write(t)
     subprocess.run([sys.executable, os.path.join(here, 'daoli2page.py'), tmp, out_html, title, intro], check=True)
 
