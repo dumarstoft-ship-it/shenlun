@@ -2,6 +2,8 @@
 import re, io, sys, html, glob, os
 
 src_dir, out = sys.argv[1], sys.argv[2]
+PAGE_TITLE = sys.argv[3] if len(sys.argv) > 3 else None
+PAGE_INTRO = sys.argv[4] if len(sys.argv) > 4 else None
 files = sorted(f for f in glob.glob(os.path.join(src_dir, '*.md')))
 order = ['00_怎么用', '00_B是什么', '00_总纲'] + [f'{i:02d}_' for i in range(1, 17)]
 def key(f):
@@ -23,8 +25,8 @@ def tags(s):
             depth -= 1; buf += ch
             if depth == 0:
                 body = buf[1:]
-                cls = 'pin' if body.startswith('拼') else ('hf' if body.startswith(('高分卷', '参考范文')) or '参考范文' in body[:12] else 'tag')
-                out.append(f'<span class="{cls}">{buf}</span>'); buf = ''
+                cls = 'pin' if body.startswith(('拼', '自拟')) else ('hf' if body.startswith(('高分卷', '参考范文')) or '参考范文' in body[:12] else 'tag')
+                out.append(buf if buf == '〔B〕' else f'<span class="{cls}">{buf}</span>'); buf = ''
         else:
             buf += ch
     out.append(buf)
@@ -84,7 +86,7 @@ def render(lines, shift):
                     out_html.append('</li>')
                 while len(stack) < lvl + 1:
                     stack.append(kind); out_html.append(f'<{kind}>')
-                out_html.append(('<li class="lz">' if txt.startswith('例子要证') else '<li>') + inline(txt))
+                out_html.append(('<li class="lz">' if txt.startswith('例子要证') else '<li class="zl">' if txt.startswith('作用链') else '<li>') + inline(txt))
             while stack:
                 out_html.append(f'</li></{stack.pop()}>')
             body.append(''.join(out_html)); continue
@@ -139,7 +141,7 @@ strong{font-weight:600}
 code{font-size:.88em; background:var(--surface2); padding:1px 5px; border-radius:4px; word-break:break-all}
 .yw{color:var(--quote)} .src{font-size:12px; color:var(--muted)}
 .tag{font-size:12.5px; color:var(--muted)} .pin{font-size:12.5px; color:var(--warn); font-weight:600} .hf{font-size:12.5px; color:var(--ok)}
-.lb{font-weight:600; color:var(--accent)} li.lz{color:var(--muted)} li.lz .lb{color:var(--ok)}
+.lb{font-weight:600; color:var(--accent)} li.lz{color:var(--muted)} li.lz .lb{color:var(--ok)} li.zl .lb{color:var(--ok)}
 blockquote{margin:0; padding:8px 12px; border-left:3px solid var(--accent); background:var(--accent-soft); border-radius:0 6px 6px 0}
 .toc{display:flex; flex-wrap:wrap; gap:6px}
 .chip{font-size:13px; text-decoration:none; color:var(--fg); background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:2px 10px}
@@ -192,5 +194,9 @@ page = f"""<!doctype html>
 </body>
 </html>
 """
+if PAGE_TITLE:
+    page = page.replace('<title>道理卡</title>', f'<title>{html.escape(PAGE_TITLE)}</title>').replace('<h1>道理卡：认出来就用</h1>', f'<h1>{html.escape(PAGE_TITLE)}</h1>')
+if PAGE_INTRO:
+    page = re.sub(r'(</h1>\n)<p>.*?</p>', lambda m: m.group(1) + '<p>' + inline(PAGE_INTRO) + '</p>', page, count=1, flags=re.S)
 io.open(out, 'w', encoding='utf-8').write(page)
 print('ok', len(page), 'chars;', len(files), 'files')
