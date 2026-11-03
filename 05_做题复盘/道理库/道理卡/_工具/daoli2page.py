@@ -33,7 +33,7 @@ def tags(s):
     return ''.join(out)
 
 def inline(s):
-    s = html.escape(s, quote=False)
+    s = html.escape(s, quote=False).replace('&lt;br&gt;', '<br>')
     s = tags(s)
     s = re.sub(r'^([^：「」〔【<>*]{1,12})：', r'<span class="lb">\1：</span>', s)
     s = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', s)
@@ -65,7 +65,7 @@ def render(lines, shift):
             cls = 'tbl wide' if len(head) >= 4 else 'tbl'
             h = [f'<div class="{cls}"><table><thead><tr>' + ''.join(f'<th>{inline(c)}</th>' for c in head) + '</tr></thead><tbody>']
             for r in rest:
-                h.append('<tr>' + ''.join(f'<td>{inline(c)}</td>' for c in r) + '</tr>')
+                h.append('<tr>' + ''.join(f'<td data-label="{html.escape(re.sub(r"[*`]", "", head[k]) if k < len(head) else "")}">{inline(c)}</td>' for k, c in enumerate(r)) + '</tr>')
             h.append('</tbody></table></div>'); body.append(''.join(h)); continue
         mm = re.match(r'^(\s*)(-|\d+\.)\s+(.*)$', l)
         if mm:
@@ -166,6 +166,15 @@ summary::before{content:"▸"; color:var(--accent); flex:none}
 details[open]>summary::before{content:"▾"}
 .sec{display:flex; flex-direction:column; gap:8px; margin-top:6px}
 .sec>p:first-child{margin-top:4px}
+@media (max-width: 640px){
+  .tbl.wide{overflow:visible; border:none; background:none}
+  .tbl.wide table{min-width:0}
+  .tbl.wide thead{display:none}
+  .tbl.wide tr{display:block; border:1px solid var(--line); border-radius:6px; margin-bottom:8px; background:var(--surface); padding:6px 10px}
+  .tbl.wide td{display:block; border:none; padding:3px 0; min-width:0}
+  .tbl.wide td::before{content:attr(data-label) "："; font-weight:600; color:var(--accent)}
+  .tbl.wide td:first-child::before{content:""}
+}
 html{scroll-behavior:smooth} @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
 """
 js = """
